@@ -6,7 +6,9 @@ const generateAccountNumber = require('../../utils/accountGen');
 const{v4 : uuid} = require('uuid');
 const upload = require('../../utils/fileUpload');
 const mailer = require('../../utils/nodeMailer');
-const mainUrl = 'http://localhost:4000'
+const mainUrl = 'http://localhost:4000';
+const {Op} = require('sequelize');
+const Messages = require('../../models/Messages');
 
 const Registration  = asyncHandler(async(req, res, next)=>{
     const data = req.body;
@@ -46,9 +48,10 @@ const login = asyncHandler(async(req, res, next)=>{
         }
     });
     if(user){
+        const {id, email} = user
         const isUSer = await bcrypt.compare(password, user.password);
         if(isUSer){
-            const token = sign(user);
+            const token = sign({id, email});
             res.status(200).send({token})
         }else{
             res.status(403);
@@ -59,7 +62,83 @@ const login = asyncHandler(async(req, res, next)=>{
 });
 const emailVerification = asyncHandler(async(req, res, next)=>{
     const {token, email} = req.query;
-    
+    const user = await Users.findOne({
+        where:{
+           [Op.and]:{
+               token, email
+           } 
+        }
+    });
+    if(user){
+        //render a successful mail verification page
+    }else{
+        res.status(404).send();
+    }
+
+});
+
+const transaction = asyncHandler(async (req, res, next) => {
+    const {id, email} = req.user;
+    const {amount, receiverId} = req.body;
+    const userBalance = (await Users.findOne({
+        where: {
+            id
+        }
+    })).balance;
+    const receiverBalance = (await Users.findOne({
+        where: {
+            id: receiverId
+        }
+    })).balance;
+    if(Number(userBalance) < Number(amount)){
+        res.status(200).send({err: 'insufficient balance'})
+    }else{
+        const newUserBalance = Number(userBalance) - Number(amount);
+        const newReceiverBalance = Number(receiverBalance) + Number(amount);
+        const debit = {
+            message: `Your account has been debited with £${amount}`,
+            type: 'debit',
+            header: 'DEBIT'
+        };
+       const credit = {
+           message: `Your account has been credited with £${amount}`,
+           type: 'credit',
+           header: 'CREDIT'
+       }
+       Users.update({
+           balance: newUserBalance
+       }, {
+           where: {
+               id
+           }
+       })
+       Users.update({
+           balance: newReceiverBalance
+       }, {
+           where: {
+               id: receiverId
+           }
+       });
+       Messages.bulkCreate([
+           debit, credit
+       ]);
+       res.status(200).send();
+    }
+})
+
+const index = asyncHandler(async (req, res, next)=>{
+    const {id} = req.user;
+    const notifications = await Messages.findAll({
+        where: {
+            user_id: id
+        }
+    });
+    const user = await Users.findOne({
+        where: {
+            id
+        }
+    });
+    res.status(200).send({user, notifications})
 })
 
 module.exports = {

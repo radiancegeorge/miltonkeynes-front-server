@@ -10,8 +10,8 @@ const sign = (objectToSign) => {
 }
 
 
-const verify = (token) => {
-    const data = jwt.verify(token, process.env.secret);
+const verify =  (token) => {
+    const data =  jwt.verify(token, process.env.secret);
     return data
 }
 
