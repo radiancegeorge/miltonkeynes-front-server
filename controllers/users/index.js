@@ -27,7 +27,7 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         //send mail
         mailer({
             to: email,
-            html: `<a href="${mainUrl}/${token}"> click here to confirm your mail</a>`
+            html: `<a href="${mainUrl}/email-verification?token=${token}&id=${email}"> click here to confirm your mail</a>`
         })
         res.status(200).send(dbData);
     }else{
@@ -57,8 +57,11 @@ const login = asyncHandler(async(req, res, next)=>{
         res.status(401).send();
     }
 });
-
+const emailVerification = asyncHandler(async(req, res, next)=>{
+    const {token, email} = req.query;
+    
+})
 
 module.exports = {
-    Registration, login
+    Registration, login, emailVerification
 }

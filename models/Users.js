@@ -117,6 +117,46 @@ module.exports = (sequelize, DataTypes) => {
         imageName: {
             type: DataTypes.STRING(500),
             unique: false
+        },
+        companyEmail:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true  
+        },
+        yearOfEstablishment:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
+        nameOfBusiness:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        }, 
+        companyAddress:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
+        jointOwners:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
+        jointPhoneNumbers: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
+        jointEmails:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
+        jointAddresses:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
         }
     });
     return User;
