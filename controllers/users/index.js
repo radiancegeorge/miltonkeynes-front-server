@@ -6,12 +6,13 @@ const generateAccountNumber = require('../../utils/accountGen');
 const{v4 : uuid} = require('uuid');
 const upload = require('../../utils/fileUpload');
 const mailer = require('../../utils/nodeMailer');
+const mainUrl = 'http://localhost:4000'
 
 const Registration  = asyncHandler(async(req, res, next)=>{
     const data = req.body;
     const {files} = req;
     const {email} = data;
-    const user = Users.findOne({
+    const user = await Users.findOne({
         where: {
             email
         }
@@ -26,7 +27,7 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         //send mail
         mailer({
             to: email,
-            html: `<a`
+            html: `<a href="${mainUrl}/${token}"> click here to confirm your mail</a>`
         })
         res.status(200).send(dbData);
     }else{
@@ -36,16 +37,16 @@ const Registration  = asyncHandler(async(req, res, next)=>{
     }
 });
 
-const login = asyncHandler((req, res, next)=>{
+const login = asyncHandler(async(req, res, next)=>{
     const {email, password} = req.body;
 
-    const user = Users.findOne({
+    const user = await Users.findOne({
         where: {
             email
         }
     });
     if(user){
-        const isUSer = bcrypt.compare(password, user.password);
+        const isUSer = await bcrypt.compare(password, user.password);
         if(isUSer){
             const token = sign(user);
             res.status(200).send({token})
