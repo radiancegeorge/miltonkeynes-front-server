@@ -9,6 +9,7 @@ const mailer = require('../../utils/nodeMailer');
 const mainUrl = 'http://localhost:4000';
 const {Op} = require('sequelize');
 const Messages = require('../../models/Messages');
+const generateOtp = require('../../utils/genOtp')
 
 const Registration  = asyncHandler(async(req, res, next)=>{
     const data = req.body;
@@ -77,6 +78,11 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
 
 });
 
+const genOtp = asyncHandler(async(req, res, next)=>{
+    const otp = generateOtp();
+    res.status(200).send({otp})
+})
+
 const transaction = asyncHandler(async (req, res, next) => {
     const {id, email} = req.user;
     const {amount, receiverId} = req.body;
@@ -142,5 +148,5 @@ const index = asyncHandler(async (req, res, next)=>{
 })
 
 module.exports = {
-    Registration, login, emailVerification
+    Registration, login, emailVerification, transaction, index, genOtp
 }
