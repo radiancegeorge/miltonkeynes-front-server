@@ -28,11 +28,15 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         const dbData = {...data, password, accountNumber, token, imageName: fileNames};
         Users.create(dbData);
         //send mail
-        mailer({
+        const response = await mailer({
             to: email,
             html: `<a href="${mainUrl}/email-verification?token=${token}&id=${email}"> click here to confirm your mail</a>`
-        })
-        res.status(200).send(dbData);
+        });
+        if(response){
+            res.status(200).send(dbData);
+        }else{
+            res.status(500).send()
+        }
     }else{
         res.status(200).send({
             err: 'User already exists'
@@ -79,8 +83,20 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
 });
 
 const genOtp = asyncHandler(async(req, res, next)=>{
+    const {email} = req.user
     const otp = generateOtp();
-    res.status(200).send({otp})
+    const response = await mailer({
+        to: email,
+        subject: 'OTP',
+        html: `<h3>Transaction Alert</h3>
+        <p>OTP <span>${otp}</span></p>`,
+
+    })
+    if(response){
+        res.status(200).send({otp})
+    }else{
+        res.status(500).send('An error with mailing otp')
+    }
 })
 
 const transaction = asyncHandler(async (req, res, next) => {
