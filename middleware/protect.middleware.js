@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { verify } = require('../utils/auth');
 
 const protect = asyncHandler((req, res, next)=>{
+    console.log('attempting login')
     const {authorization} = req.headers;
     if(authorization){
         const token = authorization.split(' ')[1];

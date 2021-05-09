@@ -12,7 +12,7 @@ const mailer = async ({user = undefined, to, from = undefined, subject, text, ht
     });
     
     const info = await transporter.sendMail({
-        from: from ? `${from.split('@')[0]} <${from}>` : `${user.split('@')[0]} <${user}>` , 
+        from:`${user.split('@')[0]} <${user}>` , 
         to,
         subject,
         text,

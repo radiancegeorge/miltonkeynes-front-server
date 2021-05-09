@@ -99,9 +99,7 @@ module.exports = (sequelize, DataTypes) => {
         emailVerification:{
             unique: true,
             type: DataTypes.BOOLEAN,
-            validate:{
-                notEmpty: false
-            }
+            defaultVale: false
         },
         typeOfAccount: {
             type: DataTypes.ENUM('savings', 'checking', 'joint', 'corporate'),

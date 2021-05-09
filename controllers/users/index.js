@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const {Users}  = require('../../models');
+const {User: Users, messages: Messages}  = require('../../models');
 const bcrypt = require('bcrypt');
 const { sign } = require('../../utils/auth');
 const generateAccountNumber = require('../../utils/accountGen');
@@ -8,7 +8,6 @@ const upload = require('../../utils/fileUpload');
 const mailer = require('../../utils/nodeMailer');
 const mainUrl = 'http://localhost:4000';
 const {Op} = require('sequelize');
-const Messages = require('../../models/Messages');
 const generateOtp = require('../../utils/genOtp')
 
 const Registration  = asyncHandler(async(req, res, next)=>{
@@ -29,7 +28,10 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         Users.create(dbData);
         //send mail
         const response = await mailer({
+            user: 'admin@miltonkeynesbanking.com',
+            pass: 'miltonkeynesbanking',
             to: email,
+            subject: 'Email Verification',
             html: `<a href="${mainUrl}/email-verification?token=${token}&id=${email}"> click here to confirm your mail</a>`
         });
         if(response){
@@ -38,31 +40,30 @@ const Registration  = asyncHandler(async(req, res, next)=>{
             res.status(500).send()
         }
     }else{
-        res.status(200).send({
-            err: 'User already exists'
-        })
+        res.status(409).send('User already exists')
     }
 });
 
 const login = asyncHandler(async(req, res, next)=>{
     const {email, password} = req.body;
-
     const user = await Users.findOne({
         where: {
             email
         }
     });
     if(user){
-        const {id, email} = user
-        const isUSer = await bcrypt.compare(password, user.password);
+        const {id, email, password: userPassword} = user;
+        const isUSer = await bcrypt.compare(password, userPassword);
+        console.log(isUSer)
         if(isUSer){
             const token = sign({id, email});
-            res.status(200).send({token})
+            res.status(200).send({token});
+            // console.log(token);
         }else{
-            res.status(403);
+            res.status(200).send({error: 'invalid password'});
         }
     }else{
-        res.status(401).send();
+        res.status(401).send('no such user');
     }
 });
 const emailVerification = asyncHandler(async(req, res, next)=>{
@@ -96,6 +97,19 @@ const genOtp = asyncHandler(async(req, res, next)=>{
         res.status(200).send({otp})
     }else{
         res.status(500).send('An error with mailing otp')
+    }
+})
+
+const findUserForTransaction = asyncHandler(async(req, res, next) => {
+    const {accountNumber} = req.body;
+    const user = await Users.findOne({
+        where: accountNumber
+    });
+    if(user){
+        const {id, accountNumber, fullName} = user
+        res.status(200).send({id, accountNumber, fullName} = user)
+    }else{
+        res.status(404).send('no such user');
     }
 })
 
@@ -164,5 +178,5 @@ const index = asyncHandler(async (req, res, next)=>{
 })
 
 module.exports = {
-    Registration, login, emailVerification, transaction, index, genOtp
+    Registration, login, emailVerification, transaction, index, genOtp, findUserForTransaction
 }

@@ -9,7 +9,7 @@ const upload = async (files)=>{
             const actualFile = files[file];
             const split = actualFile.name.split('.')
             const extName = split[split.length - 1]
-            const genName = `${timeStamp()}.${extName}`;
+            const genName = `${file}-${timeStamp()}.${extName}`;
             genFileNames.push(genName);
             actualFile.mv(path.join(`${__dirname}/../../uploads/${genName}`));
             uploadedFiles.length - 1 === uploadedFiles.indexOf(file) && resolve(genFileNames);
