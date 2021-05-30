@@ -107,7 +107,7 @@ const findUserForTransaction = asyncHandler(async(req, res, next) => {
     });
     if(user){
         const {id, accountNumber, fullName} = user
-        res.status(200).send({id, accountNumber, fullName} = user)
+        res.status(200).send({id, accountNumber, fullName})
     }else{
         res.status(404).send('no such user');
     }
@@ -134,12 +134,14 @@ const transaction = asyncHandler(async (req, res, next) => {
         const debit = {
             message: `Your account has been debited with £${amount}`,
             type: 'debit',
-            header: 'DEBIT'
+            header: 'DEBIT',
+            user_id: id,
         };
        const credit = {
            message: `Your account has been credited with £${amount}`,
            type: 'credit',
-           header: 'CREDIT'
+           header: 'CREDIT',
+           receiver_id: receiverId,
        }
        Users.update({
            balance: newUserBalance
@@ -166,7 +168,10 @@ const index = asyncHandler(async (req, res, next)=>{
     const {id} = req.user;
     const notifications = await Messages.findAll({
         where: {
-            user_id: id
+            [Op.or]:{
+                user_id: id, receiver_id: id
+            }
+            
         }
     });
     const user = await Users.findOne({
@@ -175,8 +180,20 @@ const index = asyncHandler(async (req, res, next)=>{
         }
     });
     res.status(200).send({user, notifications})
+});
+
+const getTransaction = asyncHandler( async (req, res, next)=>{
+    const {id} = req.user;
+    const transactions = await Messages.findAll({
+        where: {
+            [Op.or]:{
+                user_id: id, receiver_id: id
+            }
+        }
+    });
+    res.status(200).send(transactions);
 })
 
 module.exports = {
-    Registration, login, emailVerification, transaction, index, genOtp, findUserForTransaction
+    Registration, login, emailVerification, transaction, index, genOtp, findUserForTransaction, getTransaction
 }

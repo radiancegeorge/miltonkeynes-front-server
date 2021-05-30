@@ -5,7 +5,8 @@ const protect = require('../middleware/protect.middleware')
 const user = express.Router();
 
 
-user.post('/', protect, index);
+user.get('/', protect, index);
+
 user.post('/register', fileUpload(), Registration);
 user.post('/login', login);
 user.post('/generateOTP', genOtp);

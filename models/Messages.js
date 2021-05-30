@@ -24,6 +24,10 @@ module.exports = (sequelize, DataTypes)=>{
             type: DataTypes.ENUM('credit', 'debit', 'regular'),
             allowNull: false,
             defaultValue: 'regular'
+        },
+        receiver_id:{
+            type: DataTypes.INTEGER,
+            allowNull: true
         }
     }
     const Messages = sequelize.define('messages', object)
