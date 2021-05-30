@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes)=>{
         }, 
         user_id:{
             type: DataTypes.INTEGER,
+            allowNull: true
         },
         header:{
             type: DataTypes.STRING(500)

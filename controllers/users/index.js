@@ -192,8 +192,25 @@ const getTransaction = asyncHandler( async (req, res, next)=>{
         }
     });
     res.status(200).send(transactions);
+});
+
+const passwordReset = asyncHandler(async (req, res, next)=>{
+    const {id} = req.user;
+    const {password} = req.body;
+
+    const hashedPassword = await  bcrypt.hash(password, 10);
+
+    const updatePassword = await Users.update({
+        password: hashedPassword
+    }, {
+        where:{
+            user_id: id
+        }
+    });
+
+    res.status(200).send("password updated")
 })
 
 module.exports = {
-    Registration, login, emailVerification, transaction, index, genOtp, findUserForTransaction, getTransaction
+    Registration, login, emailVerification, transaction, index, genOtp, findUserForTransaction, passwordReset
 }
