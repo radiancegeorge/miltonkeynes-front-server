@@ -216,7 +216,7 @@ const chanegOldPass = asyncHandler(async (req, res, next)=>{
 
     const {password} = await Users.findOne({
         where:{
-            user_id: id
+            id
         }
     });
     const isPassword = await bcrypt.compare(oldPassword, password);
@@ -227,7 +227,7 @@ const chanegOldPass = asyncHandler(async (req, res, next)=>{
                 password: newEncryptedPassword
             }, {
                 where: {
-                    user_id: id
+                    id
                 }
             });
             res.status(200).send('successfully changed password');
