@@ -82,8 +82,8 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
 });
 
 const genOtp = asyncHandler(async(req, res, next)=>{
-    const {email} = req.user
-    const otp = generateOtp();
+    const {email} = req.user || req.body
+    const otp = generateOtp(6);
     const response = await mailer({
         to: email,
         subject: 'OTP',
@@ -101,7 +101,9 @@ const genOtp = asyncHandler(async(req, res, next)=>{
 const findUserForTransaction = asyncHandler(async(req, res, next) => {
     const {accountNumber} = req.body;
     const user = await Users.findOne({
-        where: accountNumber
+        where: {
+            accountNumber
+        }
     });
     if(user){
         const {id, accountNumber, fullName} = user
