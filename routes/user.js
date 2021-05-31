@@ -9,7 +9,8 @@ const {
     emailVerification,
     transaction,
     findUserForTransaction,
-    passwordReset
+    passwordReset,
+    chanegOldPass
 } = require('../controllers/users');
 
 const protect = require('../middleware/protect.middleware');
@@ -24,7 +25,8 @@ user.post('/register', fileUpload(), Registration);
 user.post('/login', login);
 user.post('/transaction',protect, transaction);
 user.post('/findUser', protect, findUserForTransaction);
-user.post('/passwordReset', protect, passwordReset);
+user.post('/passwordReset', passwordReset);
 user.post('/generateOTP', genOtp);
+user.post('/changeOldPass', protect, chanegOldPass);
 
 module.exports = user;

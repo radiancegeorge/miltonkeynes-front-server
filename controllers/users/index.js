@@ -114,7 +114,7 @@ const findUserForTransaction = asyncHandler(async(req, res, next) => {
 })
 
 const transaction = asyncHandler(async (req, res, next) => {
-    const {id, email} = req.user;
+    const {id} = req.user;
     const {amount, receiverId} = req.body;
     const userBalance = (await Users.findOne({
         where: {
@@ -195,22 +195,58 @@ const index = asyncHandler(async (req, res, next)=>{
 // });
 
 const passwordReset = asyncHandler(async (req, res, next)=>{
-    const {id} = req.user;
-    const {password} = req.body;
 
+    const {password, email} = req.body;
     const hashedPassword = await  bcrypt.hash(password, 10);
 
     const updatePassword = await Users.update({
         password: hashedPassword
     }, {
         where:{
-            user_id: id
+            email
         }
     });
 
     res.status(200).send("password updated")
+});
+
+const chanegOldPass = asyncHandler(async (req, res, next)=>{
+    const {id} = req.user;
+    const {oldPassword, newPassword} = req.body;
+
+    const {password} = await Users.findOne({
+        where:{
+            user_id: id
+        }
+    });
+    const isPassword = await bcrypt.compare(oldPassword, password);
+    if(isPassword){
+        const newEncryptedPassword = await bcrypt.hash(newPassword, 10);
+        try{
+            Users.update({
+                password: newEncryptedPassword
+            }, {
+                where: {
+                    user_id: id
+                }
+            });
+            res.status(200).send('successfully changed password');
+        }catch(err){
+            res.status(500).send()
+        }
+    }else{
+        res.status(200).send({err: "incorrect password"})
+    }
 })
 
 module.exports = {
-    Registration, login, emailVerification, transaction, index, genOtp, findUserForTransaction, passwordReset
+    Registration,
+    login,
+    emailVerification,
+    transaction,
+    index,
+    genOtp,
+    findUserForTransaction,
+    passwordReset, 
+    chanegOldPass
 }
