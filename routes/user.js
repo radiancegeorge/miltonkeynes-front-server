@@ -6,11 +6,12 @@ const user = express.Router();
 
 
 user.get('/', protect, index);
+user.get('/verifyEmail', emailVerification);
+
 
 user.post('/register', fileUpload(), Registration);
 user.post('/login', login);
 user.post('/generateOTP', genOtp);
-user.post('/verifyEmail', emailVerification);
 user.post('/transaction',protect, transaction);
 user.post('/findUser', protect, findUserForTransaction);
 user.post('/passwordReset', protect, passwordReset);

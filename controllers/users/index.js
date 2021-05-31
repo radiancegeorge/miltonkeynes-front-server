@@ -30,7 +30,7 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         const response = await mailer({
             to: email,
             subject: 'Email Verification',
-            html: `<a href="${mainUrl}/email-verification?token=${token}&id=${email}"> click here to confirm your mail</a>`
+            html: `<a href="${mainUrl}/user/verifyEmail?token=${token}&email=${email}"> click here to confirm your mail</a>`
         });
         if(response){
             res.status(200).send(dbData);
@@ -180,17 +180,17 @@ const index = asyncHandler(async (req, res, next)=>{
     res.status(200).send({user, notifications})
 });
 
-const getTransaction = asyncHandler( async (req, res, next)=>{
-    const {id} = req.user;
-    const transactions = await Messages.findAll({
-        where: {
-            [Op.or]:{
-                user_id: id, receiver_id: id
-            }
-        }
-    });
-    res.status(200).send(transactions);
-});
+// const getTransaction = asyncHandler( async (req, res, next)=>{
+//     const {id} = req.user;
+//     const transactions = await Messages.findAll({
+//         where: {
+//             [Op.or]:{
+//                 user_id: id, receiver_id: id
+//             }
+//         }
+//     });
+//     res.status(200).send(transactions);
+// });
 
 const passwordReset = asyncHandler(async (req, res, next)=>{
     const {id} = req.user;
