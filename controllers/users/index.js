@@ -28,8 +28,6 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         Users.create(dbData);
         //send mail
         const response = await mailer({
-            user: 'admin@miltonkeynesbanking.com',
-            pass: 'miltonkeynesbanking',
             to: email,
             subject: 'Email Verification',
             html: `<a href="${mainUrl}/email-verification?token=${token}&id=${email}"> click here to confirm your mail</a>`

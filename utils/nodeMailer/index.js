@@ -1,14 +1,22 @@
 const nodeMailer = require('nodemailer');
+// const SmtpConnection = require('nodemailer/lib/smtp-connection')
+const mailer = async ({user, to, subject, text, html, pass}) => {
 
-const mailer = async ({user = undefined, to, from = undefined, subject, text, html, pass = undefined}) => {
+    user = user || 'miltonkeynesbankplc@gmail.com',
+    pass = pass || '8177308092';
+
+   try{
     const transporter = nodeMailer.createTransport({
-        host: 'miltonkeynesbanking.com',
-        port: 465,
-        secure: true,
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        tls: {
+            rejectUnauthorized: false
+        },
         auth:{
-            user: user || 'admin@miltonkeynesbanking.com',
-            pass: pass || 'miltonkeynesbanking'
-        }
+            user,
+            pass
+        },
     });
     
     const info = await transporter.sendMail({
@@ -21,6 +29,9 @@ const mailer = async ({user = undefined, to, from = undefined, subject, text, ht
 
 
     return info
+   }catch(err){
+       console.log(err);
+   }
 }
 
 module.exports = mailer;
