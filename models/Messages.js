@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes)=>{
             allowNull: false,
             defaultValue: false
         },
+        amount: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         type: {
             type: DataTypes.ENUM('credit', 'debit', 'regular'),
             allowNull: false,

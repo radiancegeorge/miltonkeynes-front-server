@@ -30,7 +30,50 @@ const Registration  = asyncHandler(async(req, res, next)=>{
         const response = await mailer({
             to: email,
             subject: 'Email Verification',
-            html: `<a href="${mainUrl}/user/verifyEmail?token=${token}&email=${email}"> click here to confirm your mail</a>`
+            html: `
+            
+            <div style="
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, Roboto, sans-serif;
+        ">
+        <div style="
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        ">
+            <div style="
+                max-width: 400px;
+                padding: 10px 30px;
+            ">
+                <p>
+                    You've successfully created an account with Milton Keynes Bank.
+                    Click below to verify account.
+                </p>
+                <a style="
+                    background-color: #7001fa;
+                    color: white;
+                    padding: 10px 15px;
+                    border: none;
+                    display: inline-block;
+                    outline: none;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    margin-bottom: 20px;
+                    text-decoration: none;
+                " href="${mainUrl}/user/verifyEmail?token=${token}&email=${email}">
+                    Verify Account
+                </a>
+                <p style="
+                    font-size: 10px;
+                ">
+                    Please ignore this email if you did not sign up to milton keynes bank.
+                </p>
+            </div>
+        </div>
+    </div>`
         });
         if(response){
             res.status(200).send(dbData);
@@ -50,13 +93,24 @@ const login = asyncHandler(async(req, res, next)=>{
         }
     });
     if(user){
-        const {id, email, password: userPassword} = user;
+        const {id, email, password: userPassword, active, emailVerification} = user;
         const isUSer = await bcrypt.compare(password, userPassword);
         console.log(isUSer)
         if(isUSer){
-            const token = sign({id, email});
-            res.status(200).send({token});
-            // console.log(token);
+            if(emailVerification === true){
+                if(active === true){
+                    
+                    const token = sign({id, email});
+                    res.status(200).send({token});
+                }else{
+                    res.status(200).send({err: "account not active"})
+                }
+
+            }else{
+                res.status(200).send({err: "Email not verified"});
+                // console.log(token);
+            }
+            
         }else{
             res.status(200).send({error: 'invalid password'});
         }
@@ -74,7 +128,65 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
         }
     });
     if(user){
-        //render a successful mail verification page
+        //render a successful mail verification page;
+        const {id} = user;
+        Users.update({
+            emailVerification: true, active: true
+        }, {where: {
+            id
+        }});
+        res.status(200).send(`
+        <div style="
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, Roboto, sans-serif;
+    ">
+    <div style="
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    ">
+        <div style="
+            max-width: 450px;
+            padding: 10px 30px;
+        ">
+            <div style="
+                display: flex;
+                justify-content: center;
+            ">
+                <i style="
+                    color: #7001fa;
+                    font-size: 50px;
+                " 
+                class="fa fa-check-circle" aria-hidden="true"></i>
+            </div>
+            <p style="font-size: 20px; text-align: center;">
+                You've successfully verified your e-mail account with Milton Keynes Bank.
+            </p>
+            <div style="text-align: center;">
+                <a style="
+                    background-color: #7001fa;
+                    color: white;
+                    padding: 10px 15px;
+                    border: none;
+                    display: inline-block;
+                    outline: none;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    margin-bottom: 20px;
+                    text-decoration: none;
+                " href="https://miltonkeynesbanking.com/login">
+                    Go to home
+                </a>
+            </div>
+            
+            
+        </div>
+    </div>
+</div>
+        `)
     }else{
         res.status(404).send();
     }
