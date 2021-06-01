@@ -242,12 +242,14 @@ const transaction = asyncHandler(async (req, res, next) => {
             type: 'debit',
             header: 'DEBIT',
             user_id: id,
+            amount
         };
        const credit = {
            message: `Your account has been credited with £${amount}`,
            type: 'credit',
            header: 'CREDIT',
            receiver_id: receiverId,
+           amount
        }
        Users.update({
            balance: newUserBalance
@@ -288,17 +290,6 @@ const index = asyncHandler(async (req, res, next)=>{
     res.status(200).send({user, notifications})
 });
 
-// const getTransaction = asyncHandler( async (req, res, next)=>{
-//     const {id} = req.user;
-//     const transactions = await Messages.findAll({
-//         where: {
-//             [Op.or]:{
-//                 user_id: id, receiver_id: id
-//             }
-//         }
-//     });
-//     res.status(200).send(transactions);
-// });
 
 const passwordReset = asyncHandler(async (req, res, next)=>{
 
