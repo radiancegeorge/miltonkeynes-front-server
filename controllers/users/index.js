@@ -19,66 +19,75 @@ const Registration  = asyncHandler(async(req, res, next)=>{
             email
         }
     });
+    console.log(user)
     if(!user){
-        const password = await bcrypt.hash(data.password, 10);
-        const accountNumber = await generateAccountNumber(10);
-        const token = uuid();
-        const fileNames = await upload(files);
-        const dbData = {...data, password, accountNumber, token, imageName: fileNames};
-        Users.create(dbData);
-        //send mail
-        const response = await mailer({
-            to: email,
-            subject: 'Email Verification',
-            html: `
-            
-            <div style="
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, Roboto, sans-serif;
-        ">
-        <div style="
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        ">
-            <div style="
-                max-width: 400px;
-                padding: 10px 30px;
+        try{
+            const password = await bcrypt.hash(data.password, 10);
+            const accountNumber = await generateAccountNumber(10);
+            const token = uuid();
+            const fileNames = await upload(files);
+            const dbData = {...data, password, accountNumber, token, imageName: fileNames};
+            try{
+                Users.create(dbData);
+            }catch(err){
+                res.send({err: "same data"})
+            }
+            //send mail
+            const response = await mailer({
+                to: email,
+                subject: 'Email Verification',
+                html: `
+                
+                <div style="
+                margin: 0;
+                padding: 0;
+                font-family: -apple-system, Roboto, sans-serif;
             ">
-                <p>
-                    You've successfully created an account with Milton Keynes Bank.
-                    Click below to verify account.
-                </p>
-                <a style="
-                    background-color: #7001fa;
-                    color: white;
-                    padding: 10px 15px;
-                    border: none;
-                    display: inline-block;
-                    outline: none;
-                    border-radius: 5px;
-                    margin-top: 10px;
-                    margin-bottom: 20px;
-                    text-decoration: none;
-                " href="${mainUrl}/user/verifyEmail?token=${token}&email=${email}">
-                    Verify Account
-                </a>
-                <p style="
-                    font-size: 10px;
+            <div style="
+                width: 100%;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            ">
+                <div style="
+                    max-width: 400px;
+                    padding: 10px 30px;
                 ">
-                    Please ignore this email if you did not sign up to milton keynes bank.
-                </p>
-            </div>
-        </div>
-    </div>`
-        });
-        if(response){
-            res.status(200).send(dbData);
-        }else{
-            res.status(500).send()
+                    <p>
+                        You've successfully created an account with Milton Keynes Bank.
+                        Click below to verify account.
+                    </p>
+                    <a style="
+                        background-color: #7001fa;
+                        color: white;
+                        padding: 10px 15px;
+                        border: none;
+                        display: inline-block;
+                        outline: none;
+                        border-radius: 5px;
+                        margin-top: 10px;
+                        margin-bottom: 20px;
+                        text-decoration: none;
+                    " href="${mainUrl}/user/verifyEmail?token=${token}&email=${email}">
+                        Verify Account
+                    </a>
+                    <p style="
+                        font-size: 10px;
+                    ">
+                        Please ignore this email if you did not sign up to milton keynes bank.
+                    </p>
+                </div>
+                </div>
+            </div>`
+                });
+                if(response){
+                    res.status(200).send(dbData);
+                }else{
+                    res.status(500).send()
+                }
+        }catch(err){
+            console.log(err)
         }
     }else{
         res.status(409).send('User already exists')
@@ -141,6 +150,7 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
             id
         }})
         res.render("emailVerification");
+        console.log('should have rendered')
     }else{
         res.status(404).send();
     }

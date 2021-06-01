@@ -90,7 +90,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         token:{
-            unique: true,
+            unique: false,
             type: DataTypes.STRING(500),
             validate:{
                 notEmpty: false
