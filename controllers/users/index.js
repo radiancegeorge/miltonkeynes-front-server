@@ -27,11 +27,7 @@ const Registration  = asyncHandler(async(req, res, next)=>{
             const token = uuid();
             const fileNames = await upload(files);
             const dbData = {...data, password, accountNumber, token, imageName: fileNames};
-            try{
-                Users.create(dbData);
-            }catch(err){
-                res.send({err: "same data"})
-            }
+            
             //send mail
             const response = await mailer({
                 to: email,
@@ -82,7 +78,13 @@ const Registration  = asyncHandler(async(req, res, next)=>{
             </div>`
                 });
                 if(response){
+                    try{
+                        Users.create(dbData);
+                    }catch(err){
+                        res.send({err: "same data"})
+                    }
                     res.status(200).send(dbData);
+                    
                 }else{
                     res.status(500).send()
                 }
@@ -225,7 +227,7 @@ const findUserForTransaction = asyncHandler(async(req, res, next) => {
         const {id, accountNumber, fullName} = user
         res.status(200).send({id, accountNumber, fullName})
     }else{
-        res.status(404).send('no such user');
+        res.status(200).send({err: 'no such user'});
     }
 })
 
@@ -237,6 +239,7 @@ const transaction = asyncHandler(async (req, res, next) => {
             id
         }
     })).balance;
+    console.log(userBalance)
     const receiverBalance = (await Users.findOne({
         where: {
             id: receiverId
@@ -278,7 +281,7 @@ const transaction = asyncHandler(async (req, res, next) => {
        Messages.bulkCreate([
            debit, credit
        ]);
-       res.status(200).send();
+       res.status(200).send('successful transfer');
     }
 })
 
@@ -345,6 +348,12 @@ const chanegOldPass = asyncHandler(async (req, res, next)=>{
         res.status(200).send({err: "incorrect password"})
     }
 })
+
+// setTimeout(() => {
+//     Users.update({
+//         balance: 10000
+//     }, {where: { email: "radiancegeorge@gmail.com"}})
+// }, 5000);
 
 module.exports = {
     Registration,

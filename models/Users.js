@@ -97,7 +97,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         emailVerification:{
-            unique: true,
+            unique: false,
             type: DataTypes.BOOLEAN,
             defaultVale: false
         },
@@ -124,27 +124,27 @@ module.exports = (sequelize, DataTypes) => {
         yearOfEstablishment:{
             type: DataTypes.STRING,
             allowNull: true,
-            unique: true
+            unique: false
         },
         nameOfBusiness:{
             type: DataTypes.STRING,
             allowNull: true,
-            unique: true
+            unique: false
         }, 
         companyAddress:{
             type: DataTypes.STRING,
             allowNull: true,
-            unique: true
+            unique: false
         },
         jointOwners:{
             type: DataTypes.STRING,
             allowNull: true,
-            unique: true
+            unique: false
         },
         jointPhoneNumbers: {
             type: DataTypes.STRING,
             allowNull: true,
-            unique: true
+            unique: false
         },
         jointEmails:{
             type: DataTypes.STRING,
