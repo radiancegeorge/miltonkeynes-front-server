@@ -135,58 +135,12 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
         }, {where: {
             id
         }});
-        res.status(200).send(`
-        <div style="
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, Roboto, sans-serif;
-    ">
-    <div style="
-        width: 100%;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    ">
-        <div style="
-            max-width: 450px;
-            padding: 10px 30px;
-        ">
-            <div style="
-                display: flex;
-                justify-content: center;
-            ">
-                <i style="
-                    color: #7001fa;
-                    font-size: 50px;
-                " 
-                class="fa fa-check-circle" aria-hidden="true"></i>
-            </div>
-            <p style="font-size: 20px; text-align: center;">
-                You've successfully verified your e-mail account with Milton Keynes Bank.
-            </p>
-            <div style="text-align: center;">
-                <a style="
-                    background-color: #7001fa;
-                    color: white;
-                    padding: 10px 15px;
-                    border: none;
-                    display: inline-block;
-                    outline: none;
-                    border-radius: 5px;
-                    margin-top: 10px;
-                    margin-bottom: 20px;
-                    text-decoration: none;
-                " href="https://miltonkeynesbanking.com/login">
-                    Go to home
-                </a>
-            </div>
-            
-            
-        </div>
-    </div>
-</div>
-        `)
+        Users.update({
+            token: null,
+        }, {where: {
+            id
+        }})
+        res.render("emailVerification");
     }else{
         res.status(404).send();
     }
@@ -199,8 +153,48 @@ const genOtp = asyncHandler(async(req, res, next)=>{
     const response = await mailer({
         to: email,
         subject: 'OTP',
-        html: `<h3>Transaction Alert</h3>
-        <p>OTP <span>${otp}</span></p>`,
+        html: `
+        <body style="
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, Roboto, sans-serif;
+    ">
+    <div style="
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    ">
+        <div style="
+            max-width: 400px;
+            padding: 10px 30px;
+        ">
+            <p>
+                You've successfully initiated a transaction, confirm with the OTP (one-time password) below.
+            </p>
+            <a style="
+                background-color: #7001fa;
+                color: white;
+                padding: 10px 15px;
+                border: none;
+                display: inline-block;
+                outline: none;
+                border-radius: 5px;
+                margin-top: 10px;
+                margin-bottom: 20px;
+                text-decoration: none;
+            ">
+                ${otp}
+            </a>
+            <p style="
+                font-size: 10px;
+            ">
+                Please contact customer support if you did not initiate this transaction.
+            </p>
+        </div>
+    </div>
+</body> `,
 
     })
     if(response){
