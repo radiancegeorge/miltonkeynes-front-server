@@ -10,7 +10,8 @@ const {
     transaction,
     findUserForTransaction,
     passwordReset,
-    chanegOldPass
+    chanegOldPass,
+    messageToAdmin
 } = require('../controllers/users');
 
 const protect = require('../middleware/protect.middleware');
@@ -28,5 +29,7 @@ user.post('/findUser', protect, findUserForTransaction);
 user.post('/passwordReset', passwordReset);
 user.post('/generateOTP', genOtp);
 user.post('/changeOldPass', protect, chanegOldPass);
+user.post('/mailToAdmin', protect, messageToAdmin);
+user.post('/mailToAdmin_2', messageToAdmin);
 
 module.exports = user;

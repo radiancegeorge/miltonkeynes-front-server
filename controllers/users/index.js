@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const {User: Users, messages: Messages}  = require('../../models');
+const {User: Users, messages: Messages, AdminMessage}  = require('../../models');
 const bcrypt = require('bcrypt');
 const { sign } = require('../../utils/auth');
 const generateAccountNumber = require('../../utils/accountGen');
@@ -145,7 +145,20 @@ const emailVerification = asyncHandler(async(req, res, next)=>{
             token: null,
         }, {where: {
             id
-        }})
+        }});
+
+        const welcomeMessage = await AdminMessage.findAll({
+            where: {
+                type: "welcome"
+            }
+        });
+        const message = welcomeMessage[welcomeMessage.length -1];
+        mailer({
+            html:`
+            
+            `,
+            to: email
+        })
         res.render("emailVerification");
         console.log('should have rendered')
     }else{
@@ -376,6 +389,8 @@ const messageToAdmin = asyncHandler(async(req, res, next)=>{
    }
 
 })
+
+
 
 // setTimeout(() => {
 //     Users.update({
