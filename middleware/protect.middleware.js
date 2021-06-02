@@ -8,7 +8,6 @@ const protect = asyncHandler((req, res, next)=>{
     if(authorization){
         const token = authorization.split(' ')[1];
         const verification = verify(token);
-        console.log(verification)
         req.user = verification;
         next()
     }else{

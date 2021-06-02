@@ -109,13 +109,8 @@ const login = asyncHandler(async(req, res, next)=>{
         console.log(isUSer)
         if(isUSer){
             if(emailVerification === true){
-                if(active === true){
-                    
-                    const token = sign({id, email});
-                    res.status(200).send({token});
-                }else{
-                    res.status(200).send({err: "account not active"})
-                }
+                const token = sign({id, email});
+                res.status(200).send({token});
 
             }else{
                 res.status(200).send({err: "Email not verified"});
@@ -248,6 +243,17 @@ const transaction = asyncHandler(async (req, res, next) => {
     if(Number(userBalance) < Number(amount)){
         res.status(200).send({err: 'insufficient balance'})
     }else{
+
+        const {active} = await Users.findOne({
+            where: {
+                id
+            }
+        })
+
+        if(!active){
+            res.status(200).send({err: "Your account is not active"});
+            return
+        }
         const newUserBalance = Number(userBalance) - Number(amount);
         const newReceiverBalance = Number(receiverBalance) + Number(amount);
         const debit = {
@@ -349,10 +355,34 @@ const chanegOldPass = asyncHandler(async (req, res, next)=>{
     }
 })
 
+const messageToAdmin = asyncHandler(async(req, res, next)=>{
+    const {email} = req.user || req.body;
+    const {message} = req.body;
+
+
+   try{
+    const mail = await mailer({
+        html: `
+            Email: <a href="mailto:${email}"> ${email} </a>
+            <br />
+            message: ${message}
+
+        `,
+        to: ""//mail on its way
+    })
+    if(mail) res.send('sent');
+   }catch(err){
+       res.status(200).send({err: "oops an error occurred"})
+   }
+
+})
+
 // setTimeout(() => {
 //     Users.update({
-//         balance: 10000
-//     }, {where: { email: "radiancegeorge@gmail.com"}})
+//         active: null
+//     }, {where: {
+//         email: 'radiancegeorge@gmail.com'
+//     }})
 // }, 5000);
 
 module.exports = {
@@ -364,5 +394,6 @@ module.exports = {
     genOtp,
     findUserForTransaction,
     passwordReset, 
-    chanegOldPass
+    chanegOldPass,
+    messageToAdmin
 }
