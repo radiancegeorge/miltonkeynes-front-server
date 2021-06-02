@@ -368,11 +368,11 @@ const messageToAdmin = asyncHandler(async(req, res, next)=>{
             message: ${message}
 
         `,
-        to: ""//mail on its way
+        to: "contactmiltonkeynes@gmail.com"//mail on its way
     })
     if(mail) res.send('sent');
    }catch(err){
-       res.status(200).send({err: "oops an error occurred"})
+       res.status(200).send({err: "oops an error occurred"});
    }
 
 })
